@@ -1,0 +1,7 @@
+site,pollutant,value,unit,timestamp,period,status
+School gate,PM2.5,86,ug/m3,2026-11-10T08:00+05:30,spot,ok
+School gate,PM2.5,94,ug/m3,2026-11-10T09:00+05:30,spot,ok
+Society entrance,PM2.5,48,ug/m3,2026-11-10T08:00+05:30,spot,ok
+Society entrance,PM2.5,52,ug/m3,2026-11-10T09:00+05:30,spot,ok
+Market junction,PM2.5,68,ug/m3,2026-11-10T08:00+05:30,spot,ok
+Market junction,PM2.5,72,ug/m3,2026-11-10T09:00+05:30,spot,ok
