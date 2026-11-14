@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. **Load Sample Data** works without an API key. The fictional upload example is in `public/samples/vayumanak-sample-readings.csv`.
+Open http://localhost:3000 for your workspace. **Explore Sample Brief** opens `/demo` with fictional readings and a precomputed brief, without an API key. Demo history is stored separately from the main workspace. The fictional upload example is in `public/samples/vayumanak-sample-readings.csv`.
 
 For live Gemini generation, copy `.env.example` to `.env.local` and set:
 
@@ -34,7 +34,9 @@ Supported pollutants are PM2.5 and PM10. Inputs need explicit timestamps, units 
 
 ## Project structure
 
-- `src/app/page.tsx`: single-page interface.
+- `src/app/page.tsx`: main workspace route.
+- `src/app/demo/page.tsx`: sample brief route.
+- `src/app/workspace.tsx`: shared workspace interface.
 - `src/app/api/generate/route.ts`: server-side Gemini interpretation and briefing.
 - `src/hooks/use-workspace.ts`: workspace and browser history.
 - `src/lib/air/`: parsing, validation, metrics, samples and documents.

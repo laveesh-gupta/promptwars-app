@@ -1,3 +1,4 @@
+import type { SiteConfirmation } from './dashboard';
 export type Role = 'Ward officer' | 'Housing society' | 'School';
 export type Language = 'English' | 'Hindi';
 export type Context = {
@@ -99,6 +100,7 @@ export type Snapshot = {
   model?: string;
   promptVersion?: string;
   followUp?: FollowUp[];
+  confirmations?: Record<string, SiteConfirmation>;
 };
 export const DEFAULT_CONTEXT: Context = {
   locality: 'Bhopal · Demo neighbourhood',

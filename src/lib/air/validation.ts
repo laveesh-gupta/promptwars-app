@@ -259,6 +259,30 @@ export function validateNarrative(
   }
   return result;
 }
+function validateConfirmations(value: unknown) {
+  return Object.fromEntries(
+    Object.entries(record(value || {}))
+      .map(([key, raw]) => {
+        const c = record(raw);
+        const choice = (v: unknown): '' | 'yes' | 'no' => {
+          if (v === '' || v === 'yes' || v === 'no') return v;
+          throw new Error('Invalid confirmation.');
+        };
+        return [
+          string(key, 500),
+          {
+            sensitive: choice(c.sensitive),
+            remit: choice(c.remit),
+            siteType: string(c.siteType, 200),
+            affectedGroups: string(c.affectedGroups, 300),
+            conditions: string(c.conditions, 500),
+            rationale: string(c.rationale, 1000),
+          },
+        ];
+      })
+      .slice(0, 500),
+  );
+}
 export function validateSnapshot(value: unknown): Snapshot {
   const v = record(value);
   if (![1, 2].includes(Number(v.version)) || !['sample', 'live'].includes(String(v.mode)))
@@ -298,6 +322,7 @@ export function validateSnapshot(value: unknown): Snapshot {
     metrics: [],
     narrative: record(v.narrative) as unknown as Narrative,
     mode: v.mode as 'sample' | 'live',
+    confirmations: validateConfirmations(v.confirmations),
     statuses: {},
     notes: {},
     followUp:

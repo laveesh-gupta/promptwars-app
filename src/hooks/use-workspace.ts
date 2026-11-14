@@ -30,19 +30,26 @@ function carryForward(previous?: Snapshot | null) {
 }
 
 export type View = 'desk' | 'readings' | 'communication' | 'history';
-export function useWorkspace() {
+export function useWorkspace(demo = false) {
+  const historyKey = demo ? `${HISTORY_KEY}.demo` : HISTORY_KEY;
   const [context, setContext] = useState<Context>(DEFAULT_CONTEXT);
-  const [text, setText] = useState('');
-  const [label, setLabel] = useState('Pasted readings');
-  const [dataset, setDataset] = useState<Dataset | null>(null);
-  const [brief, setBrief] = useState<Snapshot | null>(null);
+  const [text, setText] = useState(demo ? SAMPLE_ONE : '');
+  const [label, setLabel] = useState(
+    demo ? 'Fictional Bhopal neighbourhood · period 1' : 'Pasted readings',
+  );
+  const [dataset, setDataset] = useState<Dataset | null>(() =>
+    demo ? sampleDataset(1) : null,
+  );
+  const [brief, setBrief] = useState<Snapshot | null>(() =>
+    demo ? sampleBrief(DEFAULT_CONTEXT, 1) : null,
+  );
   const [history, setHistory] = useState<Snapshot[]>([]);
   const [view, setView] = useState<View>('desk');
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [stale, setStale] = useState(false);
-  const [sample, setSample] = useState(false);
+  const [sample, setSample] = useState(demo);
   const [period, setPeriod] = useState(1);
   const [baselineId, setBaselineId] = useState('');
   const [cooldown, setCooldown] = useState(0);
@@ -52,7 +59,7 @@ export function useWorkspace() {
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
-        const saved = localStorage.getItem(HISTORY_KEY);
+        const saved = localStorage.getItem(historyKey);
         if (saved) setHistory(readHistory(saved));
       } catch {
         setError(
@@ -64,7 +71,7 @@ export function useWorkspace() {
       clearTimeout(timer);
       inflight.current?.abort();
     };
-  }, []);
+  }, [historyKey]);
   useEffect(() => {
     if (!cooldown) return;
     const timer = setTimeout(() => setCooldown((n) => n - 1), 1000);
@@ -72,7 +79,7 @@ export function useWorkspace() {
   }, [cooldown]);
   function persist(items: Snapshot[]) {
     const bounded = items.slice(0, 8);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(bounded));
+    localStorage.setItem(historyKey, JSON.stringify(bounded));
     setHistory(bounded);
   }
   function save(snapshot: Snapshot) {
@@ -156,8 +163,10 @@ export function useWorkspace() {
       setSample(false);
       setStale(true);
       setError('');
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not parse the table.');
+      return false;
     }
   }
   function editRow(id: string, patch: Partial<Observation>) {
@@ -287,6 +296,20 @@ export function useWorkspace() {
       }
     }
   }
+  function updateConfirmations(confirmations: NonNullable<Snapshot['confirmations']>) {
+    if (!brief || brief.legacyLanguage) return;
+    const updated = { ...brief, confirmations };
+    setBrief(updated);
+    if (history.some((h) => h.id === brief.id)) {
+      try {
+        persist(history.map((h) => (h.id === brief.id ? updated : h)));
+      } catch {
+        setError(
+          'Context updated on screen but could not be saved. Export before closing.',
+        );
+      }
+    }
+  }
   function openSnapshot(snapshot: Snapshot) {
     if (inflight.current) return;
     revision.current++;
@@ -317,7 +340,7 @@ export function useWorkspace() {
   function clearHistory() {
     if (inflight.current) return;
     try {
-      localStorage.removeItem(HISTORY_KEY);
+      localStorage.removeItem(historyKey);
       setHistory([]);
       setBaselineId('');
       setNotice('History removed from this browser.');
@@ -366,6 +389,7 @@ export function useWorkspace() {
     editRow,
     generate,
     updateAction,
+    updateConfirmations,
     openSnapshot,
     importHistory,
     clearHistory,
