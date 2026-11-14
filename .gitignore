@@ -43,9 +43,8 @@ next-env.d.ts
 # Local tooling
 /.serena/
 
-# Safe setup template and local tooling
+# Safe setup template
 !.env.example
-/.serena/
 
 /problem_statement.md
 /eval_report.md

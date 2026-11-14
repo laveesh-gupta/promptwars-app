@@ -94,12 +94,6 @@ function Navigation({ w }: { w: Workspace }) {
         Vayu<span className="brand-light">Manak</span>
         <i />
       </a>
-      <div className="city-marker">
-        <MapPin size={14} />
-        <span>
-          BHOPAL <small>LOCAL ACTION WORKSPACE</small>
-        </span>
-      </div>
       <nav aria-label="Workspace">
         {navigation.map(({ id, label, icon: Icon }) => (
           <button
@@ -115,27 +109,15 @@ function Navigation({ w }: { w: Workspace }) {
           </button>
         ))}
       </nav>
-      <div className="sidebar-story">
-        <Leaf size={22} />
-        <h3>
-          From a reading
-          <br />
-          to a real next step.
-        </h3>
-        <p>
-          Evidence. An owner.
-          <br />A check that follows through.
-        </p>
-        <div className="sidebar-lines" />
+      <div className="sidebar-context">
+        <span className="sidebar-context-label"><MapPin size={14} /> LOCAL WORKSPACE</span>
+        <strong>{w.context.locality}</strong>
+        <p>{w.context.role}</p>
       </div>
-      <div className="device-note">
-        <ShieldCheck size={17} />
-        <span>
-          Saved on this device<small>No account. No shared database.</small>
-        </span>
-      </div>
-      <div className="sidebar-foot">
-        BUILT FOR LOCAL IMPACT <span>v2</span>
+      <div className="sidebar-accent">
+        <Wind size={28} aria-hidden="true" />
+        <p>Evidence. An owner.<br />A next check.</p>
+        <div aria-hidden="true" />
       </div>
     </aside>
   );
@@ -297,20 +279,6 @@ function Welcome({ w }: { w: Workspace }) {
   );
 }
 function Intake({ w }: { w: Workspace }) {
-  const upload = useRef<HTMLInputElement>(null);
-  async function file(file?: File) {
-    if (!file) return;
-    if (file.size > 102400 || !/\.(csv|tsv|txt)$/i.test(file.name)) {
-      w.setError('Use a CSV, TSV or TXT file up to 100 KB.');
-      return;
-    }
-    try {
-      w.changeText(await file.text(), file.name);
-      w.setNotice('File loaded. Review locally or ask Gemini to interpret the table.');
-    } catch {
-      w.setError('The file could not be read. Try pasting the table.');
-    }
-  }
   return (
     <section className="panel intake no-print">
       <div className="panel-heading">
@@ -318,13 +286,6 @@ function Intake({ w }: { w: Workspace }) {
           number="01"
           title="Bring your local readings"
           description="Paste a table. Keep the source. Make every decision traceable."
-        />
-        <input
-          hidden
-          ref={upload}
-          type="file"
-          accept=".csv,.tsv,.txt"
-          onChange={(e) => file(e.target.files?.[0])}
         />
       </div>
       <label className="sr-only" htmlFor="readings">
@@ -1944,15 +1905,6 @@ export default function Home() {
       </a>
       <Navigation w={w} />
       <div className="main-shell">
-        <header className="topbar no-print">
-          <span>
-            LOCAL INTELLIGENCE <ChevronRight size={13} />{' '}
-            {navigation.find((n) => n.id === w.view)?.label}
-          </span>
-          <span className="topbar-right">
-            <i /> A little more breathing room <span className="avatar">WA</span>
-          </span>
-        </header>
         <main id="main">
           <div className="workspace-top no-print">
             <div>
@@ -2054,13 +2006,6 @@ export default function Home() {
           )}
           {w.view === 'communication' && <Communication w={w} />}{' '}
           {w.view === 'history' && <HistoryPanel w={w} />}
-          <footer className="page-footer no-print">
-            <span>
-              <Wind size={17} /> VayuManak
-            </span>
-            <p>Evidence. An owner. A next check.</p>
-            <small>LOCAL READINGS · THOUGHTFUL ACTION</small>
-          </footer>
         </main>
       </div>
       <EvidenceDialog metric={metric} brief={w.brief} onClose={() => setMetric(null)} />
